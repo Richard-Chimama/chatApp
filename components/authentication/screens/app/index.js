@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Button, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import ChatScreen  from './Chat';
-import {Settings} from './Settings'
+import {Settings} from './Settings';
+
 
 
 const Drawer = createDrawerNavigator();
@@ -16,7 +17,8 @@ export default function App() {
                         backgroundColor: '#3154AE',
                   },
                   headerTitleAlign:'left',
-                  headerTintColor: '#fff'
+                  headerTintColor: '#fff',
+
             }}
             >
         <Drawer.Screen name="ChatApp" component={ChatScreen} />

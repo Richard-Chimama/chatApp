@@ -1,6 +1,7 @@
 import React, {useContext} from 'react'
 import { AuthContext } from '../../contexts/AuthContext';
 import { Stack, TextInput, IconButton, Button} from "@react-native-material/core";
+import {View, Text} from 'react-native'
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 
 export const Login = ({navigation}) => {
@@ -22,6 +23,10 @@ export const Login = ({navigation}) => {
       if(email.trim() !== '' || password.trim() !== ''){
             handleLogin(email.toLowerCase(), password)
       }
+  }
+
+  const handleCreateAccount = ()=>{
+    navigation.navigate('Register')
   }
 
   if(error){
@@ -56,6 +61,12 @@ export const Login = ({navigation}) => {
        title="Login"
        onPress={handleSubmit}
         />
+    <View style={{marginTop: 25}}>
+      <Button 
+      title="create account" 
+      onPress={()=>handleCreateAccount()} 
+      />
+    </View>
     </Stack>
   )
 }

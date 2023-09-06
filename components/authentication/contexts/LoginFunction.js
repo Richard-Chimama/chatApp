@@ -31,6 +31,8 @@ const LoginFunction = () => {
         try {
           // fetch accessToken...
           await AsyncStorage.setItem('accessToken', responseData.data.accessToken);
+          await AsyncStorage.setItem('userId', responseData.data._id);
+          console.log(responseData.data._id)
           setData(responseData.data.accessToken);
         } catch (error) {
           setError(error);

@@ -15,16 +15,29 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.classwork.chatapp",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app requires access to your photo library for saving photos.",
+        "NSCameraUsageDescription": "This app requires access to your camera to take photos."
+      }
+
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": ["CAMERA", "WRITE_EXTERNAL_STORAGE"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {"cameraPermission": "Allow ChatApp to access your camera."}
+      ]
+    ]
   }
 }
