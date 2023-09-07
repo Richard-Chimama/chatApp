@@ -1,15 +1,18 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { Stack, TextInput, Button, Avatar } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
+import { StatusBar } from "expo-status-bar";
 
 const Profile = () => {
-  const { handleLogout, updateUser, accessToken} = useContext(AuthContext);
+  const { handleLogout, updateUser, accessToken, deleteUser } = useContext(AuthContext);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastname] = useState("");
+  const [statusMessage, setStatusMessage] = useState(null);
 
-  const {loading, error, data, handleUpdate} = updateUser()
+  const { loading, error, data, handleUpdate } = updateUser();
+  const {loading:isLoading, error:isError, data:DELETED, handleDelete} = deleteUser();
 
   const handleFirstname = (text) => {
     setFirstName(text);
@@ -19,19 +22,44 @@ const Profile = () => {
     setLastname(text);
   };
 
-  const onUpdateClicked = ()=>{
-    if(firstName.trim() !== '' || lastName.trim() !== ''){
-      console.log(firstName)
-      console.log(lastName)
+  const onUpdateClicked = () => {
+    if (firstName.trim() !== "" || lastName.trim() !== "") {
       handleUpdate(firstName, lastName, accessToken);
     }
-  }
-  if(data){
-    console.log(data)
-  }
+  };
+
+  const updateMessage = async () => {
+    setStatusMessage("Message Updated");
+
+    setTimeout(() => {
+      setStatusMessage(null);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    if (!loading && !error && data) {
+      updateMessage();
+    }
+  }, [loading, error, data]);
 
   return (
     <Stack spacing={20} style={{ margin: 16 }}>
+      {statusMessage && (
+        <View
+          style={{
+            backgroundColor: "green",
+            height: 40,
+            justifyContent: "center",
+            opacity: 0.7,
+          }}
+        >
+          <Text style={{ color: "white", textAlign: "center" }}>
+            {statusMessage}
+          </Text>
+        </View>
+      )}
+      <StatusBar />
+
       <View
         style={{
           justifyContent: "center",

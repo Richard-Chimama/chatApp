@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import LoginFunction from "./LoginFunction";
 import RegisterUser from "./RegisterUser";
 import updateUser from "./UpdateUser";
+import deleteUser from "./DeleteUser";
 
 export const AuthContext = createContext();
 
@@ -48,6 +49,7 @@ export const AuthProvider = ({ children }) => {
         handleLogout,
         RegisterUser,
         updateUser,
+        deleteUser
       }}
     >
       {children}

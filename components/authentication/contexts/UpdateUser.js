@@ -25,16 +25,13 @@ const updateUser = () => {
         body: JSON.stringify(info),
       });
 
-      console.log('you are here!')      
       if (update.status === 200) {
-            console.log(update)
           setData('updated');
         } else{
             setError('Authentication failed');
         }
      
     } catch (error) {
-      console.log(error)
       setError(error);
     } finally {
       setLoading(false);

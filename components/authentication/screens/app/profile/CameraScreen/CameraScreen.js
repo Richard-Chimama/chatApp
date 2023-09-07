@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Button,
   StyleSheet,
@@ -21,14 +21,30 @@ export default function CameraScreen() {
   const cameraRef = useRef(null);
   const navigation = useNavigation();
 
-  async function takePicture() {
-    if (cameraRef.current) {
-      const options = { quality: 0.5, base64: true };
-      const photo = await cameraRef.current.takePictureAsync(options);
-      setPreviewPhoto(photo.uri);
 
-      const asset = await MediaLibrary.createAssetAsync(photo.uri);
-      await FileSystem.deleteAsync(photo.uri);
+  useEffect(() => {
+    getMediaLibraryPermission();
+  }, []);
+
+  async function getMediaLibraryPermission() {
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== 'granted') {
+      alert('MEDIA_LIBRARY permission is required.');
+    }
+  }
+
+  async function takePicture() {
+    try{
+      if (cameraRef.current) {
+        const options = { quality: 0.5, base64: true };
+        const photo = await cameraRef.current.takePictureAsync(options);
+        setPreviewPhoto(photo.uri);
+
+        navigation.navigate("Preview", { photoUri: photo.uri })
+      }
+
+    }catch(error){
+      console.warn("Error taking picture: ", error)
     }
   }
 
@@ -75,18 +91,6 @@ export default function CameraScreen() {
           </TouchableOpacity>
         </View>
         <View style={styles.bottomButtons}>
-          {previewPhoto && (
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("Preview", { photoUri: previewPhoto })
-              }
-            >
-              <Image
-                style={styles.previewPhoto}
-                source={{ uri: previewPhoto }}
-              />
-            </TouchableOpacity>
-          )}
           <TouchableOpacity onPress={takePicture}>
             <MaterialIcons name="camera" size={70} color="white" />
           </TouchableOpacity>
@@ -107,8 +111,8 @@ const styles = StyleSheet.create({
   },
   bottomButtons: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
     margin: 20,
   },
   previewPhoto: {

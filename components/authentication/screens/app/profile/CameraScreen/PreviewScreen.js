@@ -10,6 +10,7 @@ const PreviewScreen = ({ route, navigation }) => {
       const savePhoto = async () => {
         const asset = await MediaLibrary.createAssetAsync(photoUri);
         await FileSystem.deleteAsync(photoUri);
+
         navigation.goBack();
       };
     
