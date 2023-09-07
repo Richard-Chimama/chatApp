@@ -9,6 +9,8 @@ const deleteUser = () => {
     setLoading(true);
     setError(null);
 
+    console.log(accessToken)
+
     try {
       const del = await fetch(
         "https://chat-api-with-auth.up.railway.app/users",
@@ -20,15 +22,17 @@ const deleteUser = () => {
         }
       );
 
-      console.log(del);
+      console.log(del.status);
 
-      if (del.status === 200) {
+      if (del.ok) {
         setData("DELETED");
       } else {
-        setError("Authentication failed");
+        console.log(del)
+        setError("Something went wrong");
       }
     } catch (error) {
-      setError(error);
+      setError(error.message || "An error occurred");
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -38,3 +42,4 @@ const deleteUser = () => {
 };
 
 export default deleteUser;
+

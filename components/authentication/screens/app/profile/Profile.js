@@ -5,11 +5,12 @@ import { Stack, TextInput, Button, Avatar } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { StatusBar } from "expo-status-bar";
 
-const Profile = () => {
+const Profile = ({navigation}) => {
   const { handleLogout, updateUser, accessToken, deleteUser } = useContext(AuthContext);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastname] = useState("");
   const [statusMessage, setStatusMessage] = useState(null);
+  const [statusColor, setStatusColor] = useState('');
 
   const { loading, error, data, handleUpdate } = updateUser();
   const {loading:isLoading, error:isError, data:DELETED, handleDelete} = deleteUser();
@@ -28,8 +29,13 @@ const Profile = () => {
     }
   };
 
-  const updateMessage = async () => {
-    setStatusMessage("Message Updated");
+  const onDeleteClicked = ()=>{
+    handleDelete(accessToken)
+  }
+
+  const statusMessages = async (text, color) => {
+    setStatusMessage(text);
+    setStatusColor(color)
 
     setTimeout(() => {
       setStatusMessage(null);
@@ -38,16 +44,31 @@ const Profile = () => {
 
   useEffect(() => {
     if (!loading && !error && data) {
-      updateMessage();
+      statusMessages("Profile Updated!", "green");
+    }
+    if(error) {
+      statusMessages(error, 'red')
     }
   }, [loading, error, data]);
+
+  useEffect(() => {
+    if (!isLoading && !isError && DELETED) {
+      statusMessages("Account deleted successfully", "yellow")
+      setTimeout(() => {
+        handleLogout()
+      }, 2000);
+    }
+    if(isError) {
+      statusMessages(isError, 'red')
+    }
+  }, [isLoading, isError, DELETED]);
 
   return (
     <Stack spacing={20} style={{ margin: 16 }}>
       {statusMessage && (
         <View
           style={{
-            backgroundColor: "green",
+            backgroundColor: statusColor,
             height: 40,
             justifyContent: "center",
             opacity: 0.7,
@@ -98,8 +119,9 @@ const Profile = () => {
       />
       <Button
         title="Delete"
+        loading={isLoading}
         style={{ backgroundColor: "red" }}
-        onPress={() => handleLogout()}
+        onPress={() => onDeleteClicked()}
       />
       <Button
         title="Logout"
