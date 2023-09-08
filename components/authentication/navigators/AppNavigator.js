@@ -6,12 +6,7 @@ const Stack = createStackNavigator();
 
 export default function AppNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Intro">
-      <Stack.Screen
-        options={{ headerShown: false }}
-        name="Intro"
-        component={IntroScreen}
-      />
+    <Stack.Navigator >
       <Stack.Screen
         name="App"
         component={App}

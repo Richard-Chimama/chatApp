@@ -6,13 +6,14 @@ const updateUser = () => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleUpdate = async (firstname, lastname, accessToken) => {
+  const handleUpdate = async (firstname, lastname, accessToken, image) => {
     setLoading(true);
     setError(null);
 
     const info = {
       firstname: firstname,
-      lastname: lastname
+      lastname: lastname,
+      image: image === undefined ? null : image
     };
 
     try {

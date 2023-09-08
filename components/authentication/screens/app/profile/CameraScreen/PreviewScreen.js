@@ -1,15 +1,21 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { View, Image, StyleSheet, Button } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
+import { AuthContext } from '../../../../contexts/AuthContext';
 
 
 const PreviewScreen = ({ route, navigation }) => {
       const { photoUri } = route.params;
+      const {updateUser, accessToken} = useContext(AuthContext)
+
+      const { loading, error, data, handleUpdate } = updateUser();
     
       const savePhoto = async () => {
         const asset = await MediaLibrary.createAssetAsync(photoUri);
         await FileSystem.deleteAsync(photoUri);
+        const image = photoUri
+        await handleUpdate(accessToken, image)
 
         navigation.goBack();
       };

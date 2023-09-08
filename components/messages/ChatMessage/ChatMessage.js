@@ -1,4 +1,5 @@
 import React from "react";
+import { Avatar } from "@react-native-material/core";
 import * as S from "./styled";
 
 const ChatMessage = React.memo(({ item, userId, openModal }) => {
@@ -17,11 +18,21 @@ const ChatMessage = React.memo(({ item, userId, openModal }) => {
       onLongPress={() => openModal(item._id)}
       delayLongPress={1000}
     >
-      <S.Username>
-        {item.user && item.user.hasOwnProperty("username")
-          ? item.user.username
-          : "placeholder"}
-      </S.Username>
+      <S.User>
+        <Avatar
+          size={32}
+          label={
+            item.user && item.user.hasOwnProperty("username")
+              ? item.user.username
+              : "placeholder"
+          }
+        />
+        <S.Username>
+          {item.user && item.user.hasOwnProperty("username")
+            ? item.user.username
+            : "placeholder"}
+        </S.Username>
+      </S.User>
       <S.Content>{item.content}</S.Content>
       <S.TimeStamp>{getTimeDifference(item.date)}</S.TimeStamp>
     </S.Container>

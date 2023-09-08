@@ -14,8 +14,9 @@ export const Container = styled.TouchableOpacity`
 
 export const Username = styled.Text`
       font-weight: 800;
-      font-size: 12px;
+      font-size: 14px;
       margin-bottom: 10px;
+      
 `
 
 export const Content = styled.Text`
@@ -26,5 +27,12 @@ export const TimeStamp = styled.Text`
       align-self: flex-end;
       margin-top: 5px;
       font-size: 10px;
+`
+
+export const User = styled.View`
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 8px;
 `
 

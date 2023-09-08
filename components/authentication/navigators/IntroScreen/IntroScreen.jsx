@@ -11,7 +11,7 @@ export default function App({ navigation }) {
       setProgress((oldProgress) => {
         if (oldProgress._value >= 1) {
           clearInterval(interval);
-          navigation.navigate('App');
+          navigation.navigate('Register');
           return oldProgress;
         }
         const newProgress = Animated.add(oldProgress, 0.1); // increment progress
