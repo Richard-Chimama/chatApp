@@ -8,13 +8,13 @@ import {
   TouchableWithoutFeedback,
   FlatList,
   KeyboardAvoidingView,
-  SafeAreaView,
   ImageBackground,
+  Platform,
   Modal,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StatusBar } from "react-native";
 import ChatMessage from "../../../../messages/ChatMessage/ChatMessage";
 import { useQuery } from "react-query";
 import * as S from "./styled";
@@ -29,6 +29,8 @@ const Chat = () => {
   const [displayedMessages, setDisplayedMessages] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [height, setHeight] = useState(50);
 
   const fetchData = async () => {
     try {
@@ -46,8 +48,7 @@ const Chat = () => {
         return res.json().then((data) => data.data.reverse());
       }
     } catch (error) {
-      console.error("Error fetching chat messages:", error);
-      throw new Error("Fetching failed");
+      setErrorMessage("Error fetching chat messages");
     }
   };
 
@@ -89,6 +90,8 @@ const Chat = () => {
   }, [isLoading, isError, chatMessages]);
 
   const handleLoadMore = () => {
+    const currentOffset = flatListRef.current?.scrollOffset || 0;
+
     const newOffset = displayedMessages.length;
     const moreMessages = chatMessages.slice(newOffset, newOffset + 20); // Adjust the number as needed
 
@@ -97,13 +100,18 @@ const Chat = () => {
       ...prevMessages,
     ]);
 
-    if (flatListRef.current) {
-      const newContentHeight = moreMessages.length * 100;
-      flatListRef.current.scrollToOffset({
-        offset: newContentHeight,
-        animated: false,
-      });
-    }
+    setTimeout(() => {
+      if (flatListRef.current) {
+        // Step 2 and 3: Calculate the new contentOffset and scroll
+        const newOffset = flatListRef.current?.scrollOffset || 0;
+        const offsetDifference = newOffset - currentOffset;
+
+        flatListRef.current.scrollToOffset({
+          offset: offsetDifference,
+          animated: false,
+        });
+      }
+    }, 100);
   }; //end of handleLoadMore
 
   const handleSend = async () => {
@@ -129,10 +137,9 @@ const Chat = () => {
           refetch();
           flatListRef.current.scrollToEnd({ animated: true });
           setInputText("");
-          // Scroll to the end after adding a new message
         }
       } catch (error) {
-        console.error("Error fetching chat messages:", error);
+        setErrorMessage("Error sending the chat message.");
       }
     }
   };
@@ -157,7 +164,8 @@ const Chat = () => {
   const handleDelete = async () => {
     try {
       const res = await fetch(
-        "https://chat-api-with-auth.up.railway.app/messages/"+selectedMessageId,
+        "https://chat-api-with-auth.up.railway.app/messages/" +
+          selectedMessageId,
         {
           method: "DELETE",
           headers: {
@@ -165,14 +173,14 @@ const Chat = () => {
           },
         }
       );
-      if (res.status === 200) {
+      if (res.ok) {
         refetch(); // Refetch messages after deletion
         closeModal();
-      }else{
-        console.log(res.message)
+      } else {
+        console.log(res.message);
       }
     } catch (error) {
-      console.error("Error fetching chat messages:", error);
+      setErrorMessage("Error deleting chat message.");
     }
   };
 
@@ -180,12 +188,25 @@ const Chat = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <ImageBackground
         source={require("../../../../../assets/flower.jpg")}
-        style={{ flex: 1 }}
+        style={{
+          flex: 1,
+          ...Platform.select({
+            android: {
+              marginTop: -50,
+              marginBottom: -20,
+            },
+          }),
+        }}
       >
+        {errorMessage && (
+          <View style={{ backgroundColor: "red", padding: 10 }}>
+            <Text style={{ color: "white" }}>{errorMessage}</Text>
+          </View>
+        )}
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : null}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
         >
           {userId !== null && (
             <FlatList
@@ -193,7 +214,11 @@ const Chat = () => {
               renderItem={renderChatMessage}
               keyExtractor={(item, index) => item._id.toString() + index}
               initialNumToRender={20}
-              maxToRenderPerBatch={25}
+              maintainVisibleContentPosition={{
+                minIndexForVisible: 1,
+                autoscrollToTopThreshold: 5,
+              }}
+              maxToRenderPerBatch={100}
               windowSize={21}
               ref={flatListRef}
               onMomentumScrollEnd={({ nativeEvent }) => {
@@ -215,12 +240,23 @@ const Chat = () => {
             }}
           >
             <TextInput
-              style={{ flex: 1, marginRight: 8 }}
+              style={{
+                flex: 1,
+                marginRight: 8,
+                minHeight: 40,
+                height: height,
+                maxHeight: 120,
+                paddingBottom: 5,
+              }}
               placeholder="Type a message..."
               value={inputText}
               onChangeText={setInputText}
               multiline={true}
-              numberOfLines={5}
+              numberOfLines={4}
+              onContentSize={(e) => {
+                const newHeight = e.nativeEvent.contentSize.height;
+                setHeight(newHeight);
+              }}
             />
             <TouchableOpacity onPress={handleSend}>
               <Ionicons name="send" size={24} color="blue" />
