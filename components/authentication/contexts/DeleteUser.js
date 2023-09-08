@@ -21,8 +21,7 @@ const deleteUser = () => {
           },
         }
       );
-
-      console.log(del.status);
+      
 
       if (del.ok) {
         setData("DELETED");
